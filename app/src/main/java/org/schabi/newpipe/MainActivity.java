@@ -56,6 +56,7 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import org.cltgs.ytb.PlaylistManager;
 import org.schabi.newpipe.databinding.ActivityMainBinding;
 import org.schabi.newpipe.databinding.DrawerHeaderBinding;
 import org.schabi.newpipe.databinding.DrawerLayoutBinding;
@@ -174,6 +175,8 @@ public class MainActivity extends AppCompatActivity {
             // and eventually searching for a new version.
             NewVersionWorker.enqueueNewVersionCheckingWork(app);
         }
+        //JPLCltgs edit
+        PlaylistManager.ititializeWorker(this);
     }
 
     private void setupDrawer() throws ExtractionException {
