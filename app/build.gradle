@@ -8,14 +8,14 @@ plugins {
 }
 
 android {
-    compileSdk 31
-    buildToolsVersion '31.0.0'
+    compileSdk 32
+    buildToolsVersion '32.0.0'
 
     defaultConfig {
         applicationId "org.schabi.newpipe"
         resValue "string", "app_name", "NewPipe"
         minSdk 21
-        targetSdk 29
+        targetSdk 32
         versionCode 990
         versionName "0.24.0"
 
@@ -178,6 +178,8 @@ sonarqube {
 }
 
 dependencies {
+    implementation 'cz.martlin:xspf-playlist:3.0.2'
+
 /** Desugaring **/
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.6'
 

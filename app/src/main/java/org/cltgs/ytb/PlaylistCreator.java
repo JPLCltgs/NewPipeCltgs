@@ -17,15 +17,18 @@ import org.schabi.newpipe.local.feed.FeedDatabaseManager;
 import org.schabi.newpipe.local.feed.service.FeedLoadManager;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import cz.martlin.xspf.playlist.collections.XSPFTracks;
+import cz.martlin.xspf.playlist.elements.XSPFFile;
+import cz.martlin.xspf.playlist.elements.XSPFTrack;
+import cz.martlin.xspf.util.XSPFException;
 import io.reactivex.rxjava3.core.Maybe;
 
 
@@ -56,43 +59,37 @@ public class PlaylistCreator extends ListenableWorker {
                         true);
         final List<StreamWithState> streamList = streams.blockingGet();
 
-        //Create file
-        final File root = new File(Environment.getExternalStorageDirectory()
-                .getPath() + "/Youtube");
-        root.mkdirs();
-        final File file = new File(root, "Feeds.m3u");
-        FileOutputStream outputStreamWriter = null;
         try {
-            file.createNewFile();
-            outputStreamWriter = new FileOutputStream(file);
-            outputStreamWriter.write("#EXTM3U\n\n".getBytes());
-            outputStreamWriter.write("##PLAYLIST: Feeds\n\n".getBytes());
-            for (final StreamWithState st : streamList) {
-                //#EXTM3U
-                //https://docs.fileformat.com/audio/m3u/
-                final String title = st.getStream().getTitle();
+            final XSPFFile file = XSPFFile.create();
 
-                final StreamInfo sti; //
-                try {
-                    final String content =
-                            "#EXTINF:0, " + title + "\n"
-                                + StreamInfo.getInfo(st.getStream().getUrl()).
-                                        getVideoStreams().get(1).getContent()
-                            + "\n\n";
-                    final byte[] mybytes = content.getBytes();
-                    outputStreamWriter.write(mybytes);
-                } catch (final IOException e) {
-                    Log.d(this.getClass().getSimpleName(), "Problem getting stream");
-                } catch (final ExtractionException e) {
-                    Log.d(this.getClass().getSimpleName(), "Problem getting stream");
-                }
+            final XSPFTracks tracks = file.playlist().tracks();
+
+            //Adding items to playlist
+            for (final StreamWithState st : streamList) {
+                final String title = st.getStream().getTitle();
+                final String url = StreamInfo.getInfo(st.getStream().getUrl()).
+                        getVideoStreams().get(1).getContent();
+
+                final XSPFTrack track = tracks.createTrack(URI.create(url), title);
+                track.setImage(URI.create(st.getStream().getThumbnailUrl()));
+                track.setCreator(st.getStream().getUploader());
+                tracks.add(track);
             }
-            outputStreamWriter.close();
-        } catch (final FileNotFoundException e) {
-            Log.d(this.getClass().getSimpleName(), "Problem writing file");
+
+            //Create file
+            final File root = new File(Environment.getExternalStorageDirectory()
+                    .getPath() + "/Youtube");
+            root.mkdirs();
+            final File f = new File(root, "Feeds.xspf");
+            file.save(f);
+        } catch (final XSPFException e) {
+            Log.d(this.getClass().getSimpleName(), "Problem creating playlist");
+        } catch (final ExtractionException e) {
+            Log.d(this.getClass().getSimpleName(), "Problem getting stream");
         } catch (final IOException e) {
             Log.d(this.getClass().getSimpleName(), "Problem writing file");
         }
+
 
         final ListenableFuture fu = new ListenableFuture() {
             @Override

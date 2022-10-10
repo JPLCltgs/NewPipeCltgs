@@ -6,13 +6,11 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
 
-
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.OneTimeWorkRequest;
-
-import androidx.work.OneTimeWorkRequest.Builder;
+import androidx.work.PeriodicWorkRequest.Builder;
+import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
+import java.util.concurrent.TimeUnit;
 
 
 public final class PlaylistManager {
@@ -20,6 +18,7 @@ public final class PlaylistManager {
 
     }
     public static void ititializeWorker(final Context context) {
+        //Permissions
         if (Build.VERSION.SDK_INT >= 30) {
             if (!Environment.isExternalStorageManager()) {
                 final Intent getpermission = new Intent();
@@ -28,14 +27,13 @@ public final class PlaylistManager {
                 context.startActivity(getpermission);
             }
         }
+
+        //Work builder
         final Builder myWorkBuilder =
-                new Builder(PlaylistCreator.class); //, 60, TimeUnit.SECONDS);
+                new Builder(PlaylistCreator.class, 4, TimeUnit.HOURS, 15,
+                        TimeUnit.MINUTES);
         WorkManager.getInstance(context).cancelAllWorkByTag("PlaylistManager");
-        final OneTimeWorkRequest myWork = myWorkBuilder.build();
-        WorkManager.getInstance(context)
-                .enqueueUniqueWork("PlaylistManager",
-                        ExistingWorkPolicy.KEEP, myWork);
+        final PeriodicWorkRequest myWork = myWorkBuilder.addTag("PlaylistManager").build();
+        WorkManager.getInstance(context).enqueue(myWork);
     }
-
-
 }
