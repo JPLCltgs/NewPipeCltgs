@@ -49,6 +49,7 @@ public class PlaylistCreator extends ListenableWorker {
     @NonNull
     @Override
     public ListenableFuture startWork() {
+        //Get streams (feeds)
         final FeedLoadManager flm = new FeedLoadManager(appContext);
         flm.startLoading(-1L, false);
         final FeedDatabaseManager feedDatabaseManager = new FeedDatabaseManager(appContext);
@@ -59,6 +60,7 @@ public class PlaylistCreator extends ListenableWorker {
                         true);
         final List<StreamWithState> streamList = streams.blockingGet();
 
+        //Create playlist
         try {
             final XSPFFile file = XSPFFile.create();
 
