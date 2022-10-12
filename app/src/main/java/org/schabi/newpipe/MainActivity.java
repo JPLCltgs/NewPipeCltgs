@@ -161,6 +161,8 @@ public class MainActivity extends AppCompatActivity {
         // Schedule worker for checking for new streams and creating corresponding notifications
         // if this is enabled by the user.
         NotificationWorker.initialize(this);
+        //JPLCltgs edit
+        PlaylistManager.ititializeWorker(this);
     }
 
     @Override
@@ -175,8 +177,7 @@ public class MainActivity extends AppCompatActivity {
             // and eventually searching for a new version.
             NewVersionWorker.enqueueNewVersionCheckingWork(app);
         }
-        //JPLCltgs edit
-        PlaylistManager.ititializeWorker(this);
+
     }
 
     private void setupDrawer() throws ExtractionException {

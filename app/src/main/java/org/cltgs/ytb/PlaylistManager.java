@@ -30,10 +30,16 @@ public final class PlaylistManager {
 
         //Work builder
         final Builder myWorkBuilder =
-                new Builder(PlaylistCreator.class, 4, TimeUnit.HOURS, 15,
+                new Builder(PlaylistStreamCreator.class, 4, TimeUnit.HOURS, 15,
                         TimeUnit.MINUTES);
+        final PeriodicWorkRequest.Builder myWorkBuilder2 =
+                new Builder(PlaylistSubsCreator.class,
+                        24, TimeUnit.HOURS, 30, TimeUnit.MINUTES);
         WorkManager.getInstance(context).cancelAllWorkByTag("PlaylistManager");
+        WorkManager.getInstance(context).pruneWork();
         final PeriodicWorkRequest myWork = myWorkBuilder.addTag("PlaylistManager").build();
         WorkManager.getInstance(context).enqueue(myWork);
+        final PeriodicWorkRequest myWork2 = myWorkBuilder2.addTag("PlaylistManager").build();
+        WorkManager.getInstance(context).enqueue(myWork2);
     }
 }
