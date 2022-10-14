@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import cz.martlin.xspf.playlist.collections.XSPFTracks;
 import cz.martlin.xspf.playlist.elements.XSPFFile;
@@ -106,7 +107,7 @@ public class PlaylistStreamCreator extends ListenableWorker {
     }
 
     private void createStreamList(final Context cxt,
-                                  final List<StreamWithState> streamList,
+                                  final List<StreamWithState> streamListFull,
                                   final String nameFile) {
         //Create playlist
         try {
@@ -115,12 +116,15 @@ public class PlaylistStreamCreator extends ListenableWorker {
             final XSPFTracks tracks = file.playlist().tracks();
 
             //Adding items to playlist
+            final List<StreamWithState> streamList = streamListFull
+                    .stream().limit(5).collect(Collectors.toList());
             for (final StreamWithState st : streamList) {
                 final String title = st.getStream().getTitle();
                 final List<VideoStream> videoStreamsForExternalPlayers =
                         ListHelper.getSortedStreamVideosList(
                                 cxt,
                                 getUrlAndNonTorrentStreams(
+
                                         StreamInfo.getInfo(
                                                 st.getStream().getUrl()
                                         ).getVideoStreams()

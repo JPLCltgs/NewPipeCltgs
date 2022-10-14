@@ -80,7 +80,7 @@ public class PlaylistSubsCreator extends ListenableWorker {
                         ExtractorHelper.getMoreChannelItems(0, st.getUrl(),
                                 currentPage).blockingGet();
                 items.addAll(moreItems.getItems());
-                if (items.size() > 40) {
+                if (items.size() > 20) {
                     break;
                 }
             }
